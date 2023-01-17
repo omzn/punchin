@@ -32,6 +32,7 @@ $ pipenv run python punchin.py -a
 * 出勤しました．
 * すでに出勤しています．
 * 本日は休暇取得中です．
+* 本日は休日です．
 
 実行が失敗すると`[ERROR]〜`というメッセージが表示されます．
 
@@ -59,16 +60,19 @@ usage: punchin.py [-h] [-a] [-l] [--headless] [--force] [-i INIFILE]
 
 KIT work attending/leaving commitment
 
-options:
-  -h, --help            show this help message and exit 
+optional arguments:
+  -h, --help            show this help message and exit
   -a, --attend          commit attending your work
   -l, --leave           commit leaving your work
+  --holidays HOLIDAYS   specify holiday definition file at CAO
   --headless            do not show chrome window
   --force               force commit
   -i INIFILE, --inifile INIFILE
                         specify ini file
 ```
+
 `punchin.py`は年次休暇等の取得を認識して，休暇の日には出勤ボタンを押せないようにしていますが，`--force`オプションによってこれを無効化できます．
+同様に，土日祝日にも出勤ボタンを押せないようにしています．こちらも`--force`オプションで無効化できます．
 
 ## 高度な使い方
 

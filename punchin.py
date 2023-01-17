@@ -8,12 +8,15 @@ import time
 import sys
 import os
 import re
+from datetime import datetime
 from configparser import ConfigParser
 import argparse   
+import wget
 
 parser = argparse.ArgumentParser(description='KIT work attending/leaving commitment') 
 parser.add_argument('-a', '--attend', action='store_true', help='commit attending your work') 
 parser.add_argument('-l', '--leave', action='store_true', help='commit leaving your work')
+parser.add_argument('--holidays', default="https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.csv", help='specify holiday definition file at CAO')
 parser.add_argument("--headless", action='store_true', help='do not show chrome window' )
 parser.add_argument('--force', action='store_true', help='force commit')
 parser.add_argument('-i', '--inifile', default="config.ini", help='specify ini file')
@@ -26,9 +29,16 @@ if args.attend != True and args.leave != True:
 config = ConfigParser()
 config.read(os.path.dirname(os.path.abspath(__file__))+'/' + args.inifile)
 
+
 web_url = config.get("jinjiweb","url")
 login_id = config.get("jinjiweb","id")
 login_pass = config.get("jinjiweb","pass")
+
+holidayfile = wget.download(args.holidays)
+with open(holidayfile,encoding='shift_jis') as f:
+  holidaydef = [s.strip() for s in f.readlines()]
+today = datetime.today().strftime("%Y/%-m/%-d")
+isholiday = True if [s for s in holidaydef if s.startswith(today)] else False
 
 options = webdriver.ChromeOptions()
 options.add_experimental_option("prefs", {
@@ -82,9 +92,12 @@ except Exception as e:
   sys.exit()
 
 try:
+  dow = datetime.now().weekday()
   result = re.search('休暇',tds[6].text) # 最後のセルに「休暇」と書いてあるか
   if result and not args.force:
     print("本日は休暇取得中です．")
+  elif (dow >= 5 or isholiday) and not args.force: 
+    print("本日は休日です．")
   else:    
     if args.attend == True:
       if btn_attend.is_enabled():
@@ -92,8 +105,7 @@ try:
         print("出勤しました．")
       else:
         print("すでに出勤しています．")
-
-    if (args.leave == True):
+    elif args.leave == True:
       if btn_leave.is_enabled():
         btn_leave.click()
         print("退勤しました．")
