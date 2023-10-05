@@ -64,7 +64,6 @@ optional arguments:
   -h, --help            show this help message and exit
   -a, --attend          commit attending your work
   -l, --leave           commit leaving your work
-  --holidays HOLIDAYS   specify holiday definition file at CAO
   --headless            do not show chrome window
   --force               force commit
   -i INIFILE, --inifile INIFILE
