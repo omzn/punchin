@@ -6,13 +6,12 @@ name = "pypi"
 [packages]
 selenium = "*"
 configparser = "*"
-webdriver-manager = "*"
-wget = "*"
+webdriver-manager >= "4.0.2"
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version >= "3.9"
 
 [scripts]
 attend="./punchin.py -a --headless"
