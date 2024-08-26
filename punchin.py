@@ -82,7 +82,7 @@ try:
     btn_modal_ok.click()
     time.sleep(1)
 except Exception as e:
-    pass
+    print(e)
 
 try:
     btn_attend = driver.find_element(By.ID, "starting_stamp_btn")  # 出勤ボタン
