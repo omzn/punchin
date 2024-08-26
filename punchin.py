@@ -78,7 +78,7 @@ except Exception as e:
 # 警告ダイアログが出た場合，とにかくOKを押す．
 try:
     btn_modal_ok = driver.find_element(By.CLASS_NAME,
-                                       "ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only ui-state-focus")
+                                       "ui-widget-overlay ui-front")
     btn_modal_ok.click()
     time.sleep(1)
 except Exception as e:
