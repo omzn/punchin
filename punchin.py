@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""KIT出勤打刻"""
+"""出勤打刻 20240826"""
 import time
 import sys
 import os
@@ -46,12 +46,19 @@ options.add_experimental_option("prefs", {
 })
 options.add_argument("--disable-extensions")
 options.add_argument("--disable-print-preview")
+options.add_argument("--no-sandbox")
 if args.headless is True:
     options.add_argument('--headless')
 
 # ChromeのWebDriverオブジェクトを作成する。
-chrome_service = fs.Service(ChromeDriverManager().install())
-driver = webdriver.Chrome(service=chrome_service, options=options)
+try:
+    chrome_service = fs.Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=chrome_service, options=options)
+#  driver = webdriver.Chrome(options=options)
+except Exception as e:
+    print("[ERROR]Chromeが起動しません．")
+    print(e)
+    sys.exit()
 
 # open web
 try:
@@ -67,6 +74,15 @@ except Exception as e:
     print(e)
     driver.quit()  # ブラウザーを終了する。
     sys.exit()
+
+# 警告ダイアログが出た場合，とにかくOKを押す．
+try:
+    btn_modal_ok = driver.find_element(By.CLASS_NAME,
+                                       "ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only ui-state-focus")
+    btn_modal_ok.click()
+    time.sleep(1)
+except Exception as e:
+    pass
 
 try:
     btn_attend = driver.find_element(By.ID, "starting_stamp_btn")  # 出勤ボタン
