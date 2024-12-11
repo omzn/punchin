@@ -77,12 +77,11 @@ except Exception as e:
 
 # 警告ダイアログが出た場合，とにかくOKを押す．
 try:
-    btn_modal_ok = driver.find_element(By.CLASS_NAME,
-                                       "ui-widget-overlay ui-front")
+    btn_modal_ok = driver.find_element(By.XPATH, "//*/text()[normalize-space(.)='OK']/parent::*")
     btn_modal_ok.click()
     time.sleep(1)
 except Exception as e:
-    print(e)
+    pass
 
 try:
     btn_attend = driver.find_element(By.ID, "starting_stamp_btn")  # 出勤ボタン
