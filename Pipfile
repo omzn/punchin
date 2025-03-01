@@ -7,11 +7,7 @@ name = "pypi"
 selenium = "*"
 configparser = "*"
 webdriver-manager = "4.0.2"
-
-[dev-packages]
-
-[requires]
-python_version = "3.9"
+slack-sdk = "*"
 
 [scripts]
 attend="./punchin.py -a --headless"

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""出勤打刻 20240826"""
+"""出勤打刻 20250226"""
 import time
 import sys
 import os
 import re
+import random
 from configparser import ConfigParser
 import argparse
 from selenium import webdriver
@@ -12,11 +13,15 @@ from selenium.webdriver.chrome import service as fs
 from webdriver_manager.chrome import ChromeDriverManager
 
 parser = argparse.ArgumentParser(
-    description='KIT work attending/leaving commitment')
+    description='Work attending/leaving commitment')
 parser.add_argument('-a', '--attend', action='store_true',
                     help='commit attending your work')
 parser.add_argument('-l', '--leave', action='store_true',
                     help='commit leaving your work')
+parser.add_argument('--delay', action='store', type=int,
+                    help='delay time to commit in seconds')
+parser.add_argument('--random', action='store_true',
+                    help='randomize delay time up to --delay')
 parser.add_argument("--headless", action='store_true',
                     help='do not show chrome window')
 parser.add_argument('--force', action='store_true', help='force commit')
@@ -30,7 +35,6 @@ if args.attend is not True and args.leave is not True:
 
 config = ConfigParser()
 config.read(os.path.dirname(os.path.abspath(__file__))+'/' + args.inifile)
-
 
 web_url = config.get("jinjiweb", "url")
 login_id = config.get("jinjiweb", "id")
@@ -49,6 +53,14 @@ options.add_argument("--disable-print-preview")
 options.add_argument("--no-sandbox")
 if args.headless is True:
     options.add_argument('--headless')
+
+# 遅延処理
+if args.delay:
+    if args.random:
+        delay = random.randint(1, args.delay)
+    else:
+        delay = args.delay
+    time.sleep(delay)
 
 # ChromeのWebDriverオブジェクトを作成する。
 try:
@@ -79,6 +91,7 @@ except Exception as e:
 try:
     btn_modal_ok = driver.find_element(By.XPATH, "//*/text()[normalize-space(.)='OK']/parent::*")
     btn_modal_ok.click()
+    #print("[INFO]警告ダイアログが出たため，OKを押しました．")
     time.sleep(1)
 except Exception as e:
     pass
