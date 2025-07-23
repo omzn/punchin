@@ -56,14 +56,16 @@ $ pipenv run python punchin.py -l
 ## 実行ファイル(punchin.py)の仕様
 
 ```
-usage: punchin.py [-h] [-a] [-l] [--headless] [--force] [-i INIFILE]
+usage: punchin.py [-h] [-a] [-l] [--delay DELAY] [--random] [--headless] [--force] [-i INIFILE]
 
-KIT work attending/leaving commitment
+Work attending/leaving commitment
 
 optional arguments:
   -h, --help            show this help message and exit
   -a, --attend          commit attending your work
   -l, --leave           commit leaving your work
+  --delay DELAY         delay time to commit in seconds
+  --random              randomize delay time up to --delay
   --headless            do not show chrome window
   --force               force commit
   -i INIFILE, --inifile INIFILE
@@ -73,6 +75,8 @@ optional arguments:
 `punchin.py`は年次休暇等の取得を認識して，休暇の日には出勤ボタンを押せないようにしていますが，`--force`オプションによってこれを無効化できます．
 同様に，土日祝日にも出勤ボタンを押せないようにしています．こちらも`--force`オプションで無効化できます．
 
+`--delay`オプションを使用すると，指定した秒数だけ待機してから打刻を実行します．`--random`オプションと組み合わせると，1秒から指定した秒数までの間でランダムな時間待機します．
+
 ## 高度な使い方
 
 * 配布パッケージはpipenvを利用した環境になっていますが，お手持ちのシステムのpythonに必要パッケージをインストールすることで，ディレクトリに依存せず実行できるようになります．
@@ -81,6 +85,8 @@ $ pip3 install -r requirements.txt
 ```
 その後，`punchin.py`を任意のディレクトリにコピーして，実行させることができます．
 ```
-$ python /some/where/else/punchin.py -a --headless  # 出勤・ウィンドウ無
-$ python /some/where/else/punchin.py -l             # 退勤・ウィンドウ有
+$ python /some/where/else/punchin.py -a --headless          # 出勤・ウィンドウ無
+$ python /some/where/else/punchin.py -l                     # 退勤・ウィンドウ有
+$ python /some/where/else/punchin.py -a --delay 300         # 5分後に出勤
+$ python /some/where/else/punchin.py -a --delay 600 --random # 1-10分のランダム時間後に出勤
 ```
