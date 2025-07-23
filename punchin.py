@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""出勤打刻 20250226"""
+"""出勤打刻 20250723"""
 import time
 import sys
 import os
@@ -31,7 +31,7 @@ args = parser.parse_args()
 
 if args.attend is not True and args.leave is not True:
     print("Either --attend(-a) or --leave(-l) must be specified.")
-    sys.exit()
+    sys.exit(-1)
 
 config = ConfigParser()
 config.read(os.path.dirname(os.path.abspath(__file__))+'/' + args.inifile)
@@ -70,7 +70,7 @@ try:
 except Exception as e:
     print("[ERROR]Chromeが起動しません．")
     print(e)
-    sys.exit()
+    sys.exit(-1)
 
 # open web
 try:
@@ -85,7 +85,7 @@ except Exception as e:
     print("[ERROR]ログインできません．")
     print(e)
     driver.quit()  # ブラウザーを終了する。
-    sys.exit()
+    sys.exit(-1)
 
 # 警告ダイアログが出た場合，とにかくOKを押す．
 try:
@@ -103,7 +103,7 @@ except Exception as e:
     print("[ERROR]ボタンを取得できません．(おそらく，ログインに関する問題です．)")
     print(e)
     driver.quit()  # ブラウザーを終了する。
-    sys.exit()
+    sys.exit(-1)
 
 try:
     work_info_table = driver.find_element(By.ID, "work_info_tbl")  # 勤務状況テーブル
@@ -113,7 +113,7 @@ except Exception as e:
     print("[ERROR]勤務状況を取得できません．")
     print(e)
     driver.quit()  # ブラウザーを終了する。
-    sys.exit()
+    sys.exit(-1)
 
 try:
     nonworking1 = re.search('休暇', tds[6].text)  # 最後のセルに「休暇」と書いてあるか
@@ -127,12 +127,14 @@ try:
         if args.attend is True:
             if btn_attend.is_enabled():
                 btn_attend.click()
+                time.sleep(2)
                 print("出勤しました．")
             else:
                 print("すでに出勤しています．")
         elif args.leave is True:
             if btn_leave.is_enabled():
                 btn_leave.click()
+                time.sleep(2)
                 print("退勤しました．")
             else:
                 if btn_attend.is_enabled():
@@ -142,6 +144,7 @@ try:
 except Exception as e:
     print("[ERROR]操作に失敗しました．")
     print(e)
+    sys.exit(-1)
 
 driver.quit()  # ブラウザーを終了する。
-sys.exit()
+sys.exit(0)  # 正常終了
