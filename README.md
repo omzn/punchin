@@ -4,16 +4,16 @@
 
 0. Google Chromeをインストールしておきます．
 
-linux:
+linux x64:
 ```
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+$ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 $ sudo apt install -y ./google-chrome-stable_current_amd64.deb
 ```
 
 1. 展開/クローンしたディレクトリ内で，`config.sample.ini` を`config.ini`にコピーし，id, passを適切に記述します．
 2. システムにpipenvが存在しなかったら，pipenvをインストールします．
 ```
-$ pip install pipenv
+$ apt install pipenv
 ```
 3. ディレクトリ内で`pipenv install`を実行します．
 ```
