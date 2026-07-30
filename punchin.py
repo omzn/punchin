@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""出勤打刻 20250723"""
+"""出勤打刻 20260730"""
 import time
 import sys
 import os
@@ -11,6 +11,54 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome import service as fs
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import (
+    ElementClickInterceptedException,
+    StaleElementReferenceException,
+    TimeoutException,
+)
+
+# タイトルが「警告」の jQuery UI ダイアログ
+DIALOG_XPATH = (
+    '//div[contains(@class, "ui-dialog")]'
+    '[.//span[contains(@class, "ui-dialog-title")][normalize-space() = "警告"]]'
+)
+# そのダイアログのボタン領域にある OK ボタン（dialog 要素からの相対パス）
+OK_BUTTON_XPATH = (
+    './/div[contains(@class, "ui-dialog-buttonpane")]'
+    '//button[normalize-space() = "OK"]'
+)
+
+def dismiss_warning_dialog(driver, timeout=5.0):
+    """警告ダイアログが出ていれば OK を押す．出なければ何もしない．
+
+    Returns:
+        bool: ダイアログを閉じたら True，出現しなかったら False．
+    """
+    try:
+        dialog = WebDriverWait(driver, timeout).until(
+            EC.visibility_of_element_located((By.XPATH, DIALOG_XPATH))
+        )
+    except TimeoutException:
+        return False
+
+    try:
+        dialog.find_element(By.XPATH, OK_BUTTON_XPATH).click()
+    except ElementClickInterceptedException:
+        # ui-widget-overlay やフェードイン中のアニメーションに邪魔された場合の保険
+        btn_ok = dialog.find_element(By.XPATH, OK_BUTTON_XPATH)
+        driver.execute_script("arguments[0].click();", btn_ok)
+    except StaleElementReferenceException:
+        # クリック前にダイアログ側が勝手に閉じた
+        return True
+
+    # 実際に閉じたことを確認してから戻る（後続処理がオーバーレイに邪魔されないように）
+    WebDriverWait(driver, timeout).until(
+        EC.invisibility_of_element_located((By.XPATH, DIALOG_XPATH))
+    )
+    return True
+
 
 parser = argparse.ArgumentParser(
     description='Work attending/leaving commitment')
@@ -88,12 +136,8 @@ except Exception as e:
     sys.exit(-1)
 
 # 警告ダイアログが出た場合，とにかくOKを押す．
-try:
-    btn_modal_ok = driver.find_element(By.XPATH, "//*/text()[normalize-space(.)='OK']/parent::*")
-    btn_modal_ok.click()
+if dismiss_warning_dialog(driver):
     #print("[INFO]警告ダイアログが出たため，OKを押しました．")
-    time.sleep(1)
-except Exception as e:
     pass
 
 try:
